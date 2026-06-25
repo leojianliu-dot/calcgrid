@@ -1,0 +1,148 @@
+/* CalcGrid styles — self-contained with the module (imported by CalcGrid.tsx).
+   Expects these theme CSS variables from the host (with sensible firm defaults):
+   --line (#e5e4e2), --accent (#d97757), --ink (#1a1a1a), --muted (#6a6a6a). */
+
+/* ---- Calc sheets (scratch-paper calculator) ---- */
+.calc-wrap { display: inline-block; margin-left: 4px; }
+/* Excel point mode: cells being referenced (single click or drag range) glow coral. */
+.calc-cell.calc-point { background: rgba(217,119,87,0.18); }
+.calc-table.pointing { user-select: none; }
+.calc-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.45); display: flex; align-items: center; justify-content: center; z-index: 120; }
+.calc-modal { width: min(900px, 94vw); max-height: 88vh; overflow: auto; background: #fff; border-radius: 10px; padding: 16px 20px; box-shadow: 0 12px 48px rgba(0,0,0,0.3); }
+.calc-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.calc-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.calc-tab { padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; font-size: 13px; cursor: pointer; }
+.calc-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.calc-tab-edit { font-family: inherit; outline: none; min-width: 90px; }
+.calc-tab-edit:focus { border-color: var(--accent); }
+.calc-sheet { border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.calc-table { border-collapse: collapse; }
+/* Headers keep a framed border; value cells draw their own gridlines via box-shadow
+   insets (see cellDivStyle) so adjacent cells never stack into a "double" line. */
+.calc-table th { border: 1px solid var(--line); padding: 0; vertical-align: middle; }
+.calc-table td { border: 0; padding: 0; vertical-align: middle; }
+.calc-corner { width: 30px; background: #f1efec; }
+.calc-collabel { text-align: center; font-size: 11px; color: var(--muted); background: #f1efec; }
+.calc-rownum { background: #f1efec; display: flex; align-items: center; }
+.calc-rownum > span { width: 18px; text-align: center; font-size: 11px; color: var(--muted); }
+.calc-cell { border: none; padding: 3px 8px; font-size: 13px; box-sizing: border-box; width: 100%; outline: none; background: transparent; }
+.calc-cell.value { text-align: right; }
+.calc-cell:focus { background: #fdf3ee; }
+.calc-rownum .calc-cell { width: 180px; background: transparent; }
+.calc-valuecell { position: relative; }
+.calc-send { position: absolute; top: 2px; right: 2px; font-size: 10px; padding: 0 4px; border: 1px solid var(--accent); color: var(--accent); background: #fff; border-radius: 4px; cursor: pointer; opacity: 0.85; }
+.calc-valuecell:hover .calc-send { opacity: 1; }
+
+/* Select / edit model: non-editing cells render as display divs. */
+.calc-grid { display: inline-block; outline: none; position: relative; }
+.calc-celldiv { box-sizing: border-box; width: 100%; min-height: 22px; display: flex; align-items: center; cursor: cell; white-space: nowrap; overflow: hidden; }
+.calc-celldiv.value { justify-content: flex-end; }
+.calc-active { outline: 2px solid var(--accent); outline-offset: -2px; }
+.calc-selected { background: rgba(217,119,87,0.12); }
+.calc-ref { outline: 2px dashed rgba(37,99,235,0.75); outline-offset: -2px; } /* cells a formula references */
+
+/* Formula bar (shows the active cell's raw content / formula). */
+.calc-fxbar { display: flex; align-items: stretch; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.calc-fxaddr { min-width: 56px; padding: 5px 8px; background: #f1efec; color: var(--muted); font-size: 12px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); }
+.calc-fxinput { flex: 1; border: none; outline: none; padding: 5px 10px; font-size: 13px; font-family: inherit; background: #fff; }
+
+/* Clean header frame: column letters + row numbers (static, click to select). */
+.calc-colhead, .calc-rowhead { background: #f1efec; color: var(--muted); font-weight: normal; font-size: 11px; text-align: center; cursor: pointer; user-select: none; }
+.calc-colhead { padding: 3px 6px; position: relative; }
+.calc-colresize { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 2; }
+.calc-rowhead { width: 30px; padding: 3px 4px; }
+.calc-colhead.sel, .calc-rowhead.sel { background: rgba(217,119,87,0.30); color: var(--ink); }
+.calc-corner { width: 30px; background: #e7e3dd; cursor: pointer; }
+/* Gridlines toggle: hide value-cell borders (header frame keeps its lines). */
+.calc-table.calc-nogrid td { border-color: transparent; }
+
+/* Formatting toolbar. */
+.calc-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.calc-tb { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 5px; background: #fff; font-size: 13px; line-height: 1; cursor: pointer; color: var(--ink); }
+.calc-tb.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.calc-tb:disabled { opacity: 0.35; cursor: default; }
+.calc-tb:disabled:hover { border-color: var(--line); color: var(--ink); }
+/* Sheet-switcher tabs, rendered just under the toolbar. */
+.calc-tabrow { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.calc-tb input[type="color"] { width: 18px; height: 18px; border: none; padding: 0; background: none; cursor: pointer; }
+.calc-tb input[type="checkbox"] { cursor: pointer; }
+.calc-tb-sep { width: 1px; align-self: stretch; background: var(--line); margin: 2px 3px; }
+.calc-tb-sel { padding: 2px 4px; font-family: inherit; }
+.calc-colorwrap { position: relative; display: inline-flex; }
+.calc-palette { position: absolute; top: 100%; left: 0; margin-top: 3px; z-index: 30; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px; display: grid; grid-template-columns: repeat(6, 18px); gap: 5px; box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+.calc-swatch { width: 18px; height: 18px; border: 1px solid rgba(0,0,0,0.25); border-radius: 3px; padding: 0; cursor: pointer; }
+.calc-swatch-none { display: flex; align-items: center; justify-content: center; background: #fff; font-size: 11px; color: #888; }
+.calc-bordermenu { grid-template-columns: repeat(3, auto); gap: 4px; }
+.calc-bdicon { display: inline-flex; align-items: center; justify-content: center; padding: 4px; border: 1px solid var(--line); border-radius: 4px; background: #fff; cursor: pointer; }
+.calc-bdicon:hover { background: #f1efec; border-color: var(--accent); }
+.calc-tb svg { display: block; }
+
+/* Toolbar: push the trailing controls (save status / Help / delete sheet) to the right. */
+.calc-tb-spacer { flex: 1 1 auto; }
+.calc-tb-danger:hover { border-color: #dc2626; color: #dc2626; }
+.calc-savestate { font-size: 12px; color: var(--muted); padding: 0 6px; align-self: center; }
+.calc-save-saving { color: var(--muted); }
+.calc-save-saved { color: #16a34a; }
+.calc-save-error { color: #dc2626; font-weight: 600; }
+
+/* Add-row / add-column "+" affordances next to the last row / column. */
+.calc-addhead { color: var(--muted); font-size: 14px; line-height: 1; cursor: pointer; user-select: none; background: #f7f5f2; }
+.calc-addhead:hover { background: rgba(217,119,87,0.18); color: var(--accent); }
+.calc-addspacer, .calc-addrow td { background: transparent; }
+.calc-addrow th + td { border: 0; }
+
+/* Copy marquee — thin dotted "marching ants" overlay over the copied range. */
+.calc-marquee {
+  position: absolute; pointer-events: none; z-index: 6;
+  background-image:
+    linear-gradient(90deg, #15803d 50%, transparent 0),
+    linear-gradient(90deg, #15803d 50%, transparent 0),
+    linear-gradient(0deg, #15803d 50%, transparent 0),
+    linear-gradient(0deg, #15803d 50%, transparent 0);
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-size: 6px 1px, 6px 1px, 1px 6px, 1px 6px;
+  background-position: 0 0, 0 100%, 0 0, 100% 0;
+  animation: calc-ants 0.5s linear infinite;
+}
+@keyframes calc-ants {
+  to { background-position: 6px 0, -6px 100%, 0 -6px, 100% 6px; }
+}
+
+/* Cell-annotation anchor button (sits in one empty cell; click = show/hide, drag = move). */
+.calc-annobtn { box-sizing: border-box; width: 100%; min-height: 22px; display: flex; align-items: center; gap: 2px; padding: 0 6px; border: 1px solid #93b4f5; border-radius: 4px; background: #eef3fe; color: #1e3a8a; font-size: 11px; line-height: 1; cursor: grab; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.calc-annobtn.open { background: #2563eb; border-color: #2563eb; color: #fff; }
+.calc-annobtn:hover { box-shadow: 0 0 0 1px #2563eb; }
+.calc-droptarget { outline: 2px dashed #2563eb; outline-offset: -2px; }
+
+/* "Click an empty cell to place it" banner. */
+.calc-placing { margin-bottom: 8px; padding: 6px 10px; border: 1px solid #93b4f5; background: #eef3fe; color: #1e3a8a; border-radius: 6px; font-size: 13px; }
+
+/* Help popup (the user guide). */
+.calc-help { width: min(680px, 94vw); }
+.calc-help-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 13px; color: var(--ink); line-height: 1.5; }
+.calc-help-list code { background: #f1efec; padding: 1px 4px; border-radius: 3px; font-size: 12px; }
+
+/* Annotation panel: non-blocking, draggable + corner-resizable floating window. */
+.anno-panel { position: fixed; z-index: 200; min-width: 220px; min-height: 160px; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.28); display: flex; flex-direction: column; overflow: hidden; }
+.anno-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #f1efec; border-bottom: 1px solid var(--line); cursor: move; user-select: none; }
+.anno-cell { font-size: 11px; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+.anno-num { font-size: 11px; font-weight: 700; color: #2563eb; }
+.anno-title-text { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: text; }
+.anno-title-text.untitled { color: var(--muted); font-weight: 400; font-style: italic; }
+.anno-title-edit { flex: 1; min-width: 0; border: 1px solid var(--accent); border-radius: 4px; background: #fff; font-size: 13px; font-weight: 600; color: var(--ink); outline: none; padding: 2px 6px; }
+.anno-x { border: none; background: none; cursor: pointer; font-size: 13px; color: var(--muted); padding: 2px 4px; }
+.anno-x:hover { color: var(--ink); }
+.anno-body { flex: 1; min-height: 0; padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: auto; }
+.anno-img { max-width: 100%; object-fit: contain; border: 1px solid var(--line); border-radius: 6px; }
+.anno-imgph, .anno-drop { padding: 14px; text-align: center; font-size: 12px; color: var(--muted); border: 1px dashed var(--line); border-radius: 6px; }
+.anno-notetools { display: flex; gap: 4px; }
+.anno-notetools button { padding: 1px 7px; border: 1px solid var(--line); border-radius: 4px; background: #fff; cursor: pointer; font-size: 12px; line-height: 1.4; }
+.anno-notetools button:hover { border-color: var(--accent); }
+.anno-note { flex: 1; min-height: 48px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; line-height: 1.5; outline: none; overflow: auto; }
+.anno-note:empty::before { content: attr(data-ph); color: var(--muted); }
+.anno-foot { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-top: 1px solid var(--line); }
+.anno-confirm { font-size: 12px; color: var(--ink); }
+.anno-del { border-color: #dc2626; color: #dc2626; }
+.anno-del:hover { background: #dc2626; border-color: #dc2626; color: #fff; }
+.anno-resize { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, var(--muted) 50%, var(--muted) 60%, transparent 60%, transparent 72%, var(--muted) 72%, var(--muted) 82%, transparent 82%); }

@@ -1,0 +1,54 @@
+/* Theme variables the CalcGrid module expects (firm defaults). */
+:root {
+  --ink: #1a1a1a;
+  --muted: #6a6a6a;
+  --line: #e5e4e2;
+  --accent: #d97757;
+  --accent-hover: #c4684a;
+  --bg: #faf9f7;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Roboto, sans-serif;
+  font-size: 14px;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Generic buttons (the module uses .act-btn for panel/help buttons). */
+button { font-family: inherit; }
+.act-btn {
+  padding: 6px 12px; border: 1px solid var(--line); background: #fff; border-radius: 6px;
+  font-size: 13px; cursor: pointer; color: var(--ink);
+}
+.act-btn:hover { border-color: var(--accent); color: var(--accent); }
+.meta { color: var(--muted); font-size: 13px; }
+.meta.small { font-size: 12px; }
+
+/* Demo chrome */
+.demo { max-width: 1180px; margin: 0 auto; padding: 16px; }
+.demo-head { margin-bottom: 14px; }
+.demo-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.demo-title h1 { font-size: 28px; margin: 0; color: #042c53; letter-spacing: -0.5px; }
+.demo-title .tag { font-size: 14px; color: var(--accent); font-weight: 600; }
+.demo-sub { margin: 6px 0 0; color: var(--muted); line-height: 1.5; }
+.demo-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; align-items: center; }
+.demo-actions a.btnlink { text-decoration: none; }
+.demo-note {
+  background: #eef3fe; border: 1px solid #c7dbfb; color: #1e3a8a;
+  border-radius: 8px; padding: 8px 12px; font-size: 12.5px; line-height: 1.5; margin-top: 8px;
+}
+.demo-foot { margin-top: 18px; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+.demo-foot a { color: var(--accent); }
+
+/* Mobile: let the grid scroll horizontally instead of overflowing the page. */
+.demo .calc-grid { max-width: 100%; overflow: auto; -webkit-overflow-scrolling: touch; }
+.calc-cell, .calc-celldiv, .calc-annobtn, .calc-tb { touch-action: manipulation; }
+
+@media (max-width: 600px) {
+  .demo { padding: 10px; }
+  .demo-title h1 { font-size: 23px; }
+}
