@@ -437,7 +437,7 @@ export default function CalcGrid({
 
   // Drag a column header's right edge to resize. If the dragged column is part
   // of a multi-column selection, all selected columns resize together.
-  const onColResizeStart = (e: React.MouseEvent, col: number) => {
+  const onColResizeStart = (e: React.PointerEvent, col: number) => {
     e.preventDefault();
     e.stopPropagation(); // don't also select the column
     if (!model) return;
@@ -459,8 +459,8 @@ export default function CalcGrid({
       setModel(next); modelRef.current = next; // live; persisted on mouseup
     };
     const end = () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseup", end);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", end);
       if (modelRef.current && before && modelRef.current !== before) {
         undoStack.current.push(before); // one undo for the whole drag
         if (undoStack.current.length > UNDO_MAX) undoStack.current.shift();
@@ -468,8 +468,8 @@ export default function CalcGrid({
         saveModel(modelRef.current, { history: false });
       }
     };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", end);
   };
 
   const clearSelection = () => {
@@ -654,11 +654,11 @@ export default function CalcGrid({
   };
 
   // Drag an anchor button to re-anchor it to another empty cell (a click = toggle panel).
-  const startAnnoDrag = (e: React.MouseEvent, a: CalcAnnotation) => {
+  const startAnnoDrag = (e: React.PointerEvent, a: CalcAnnotation) => {
     e.preventDefault(); e.stopPropagation();
     const mx = e.clientX, my = e.clientY;
     let moved = false, target: string | null = null;
-    const move = (ev: MouseEvent) => {
+    const move = (ev: PointerEvent) => {
       if (!moved && (Math.abs(ev.clientX - mx) > 4 || Math.abs(ev.clientY - my) > 4)) moved = true;
       if (!moved) return;
       const el = (document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null)?.closest("[data-cell]");
@@ -668,13 +668,13 @@ export default function CalcGrid({
       setDropTarget(target);
     };
     const end = () => {
-      window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", end);
+      window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", end);
       setDropTarget(null);
       if (!moved) { toggleAnno(a); return; }
       if (target) { const [r, c] = target.split(":").map(Number); patchAnno(a.id, { r, c }, true); }
     };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", end);
   };
 
   const onPaste = (e: React.ClipboardEvent) => {
@@ -1050,7 +1050,7 @@ export default function CalcGrid({
                     onMouseEnter={() => { if (headerDrag.current === "col") { setActive({ row: 1, col }); setSel((s) => (s ? { ...s, aRow: 1, hRow: model.numRows, hCol: col } : s)); } }}
                   >
                     {numToColLetter(col)}
-                    <span className="calc-colresize" title="Drag to resize" onMouseDown={(e) => onColResizeStart(e, col)} />
+                    <span className="calc-colresize" title="Drag to resize" onPointerDown={(e) => onColResizeStart(e, col)} />
                   </th>
                 );
               })}
@@ -1081,7 +1081,7 @@ export default function CalcGrid({
                           <button
                             className={`calc-annobtn${anno.open ? " open" : ""}`}
                             title="Note — click to show/hide, drag to move"
-                            onMouseDown={(e) => startAnnoDrag(e, anno)}
+                            onPointerDown={(e) => startAnnoDrag(e, anno)}
                           >
                             {anno.imageId ? "📷 " : "📝 "}#{entry!.num}{anno.title ? ` ${anno.title}` : ""}
                           </button>

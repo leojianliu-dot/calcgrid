@@ -74,31 +74,31 @@ export default function CalcAnnoPanel({
     if (noteRef.current) noteRef.current.innerHTML = cleanNote(anno.note || "");
   }, [anno.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const startDrag = (e: React.MouseEvent) => {
+  const startDrag = (e: React.PointerEvent) => {
     // Don't start a drag from the close button or the (editing) title input — and
     // no preventDefault, so a double-click on the title still registers. The bar
     // has user-select:none, so dragging won't select text.
     if ((e.target as HTMLElement).closest("button, input")) return;
     const sx = pos.x, sy = pos.y, mx = e.clientX, my = e.clientY;
     let moved = false, nx = sx, ny = sy;
-    const move = (ev: MouseEvent) => {
+    const move = (ev: PointerEvent) => {
       if (!moved && (Math.abs(ev.clientX - mx) > 3 || Math.abs(ev.clientY - my) > 3)) moved = true;
       if (moved) { nx = clampX(sx + (ev.clientX - mx)); ny = clampY(sy + (ev.clientY - my)); setPos({ x: nx, y: ny }); }
     };
-    const end = () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", end); if (moved) onPatch({ x: nx, y: ny }); };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
+    const end = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", end); if (moved) onPatch({ x: nx, y: ny }); };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", end);
   };
 
-  const startResize = (e: React.MouseEvent) => {
+  const startResize = (e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const sw = size.w, sh = size.h, mx = e.clientX, my = e.clientY;
     let nw = sw, nh = sh;
-    const move = (ev: MouseEvent) => { nw = Math.max(MIN_W, sw + (ev.clientX - mx)); nh = Math.max(MIN_H, sh + (ev.clientY - my)); setSize({ w: nw, h: nh }); };
-    const end = () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", end); onPatch({ w: nw, h: nh }); };
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
+    const move = (ev: PointerEvent) => { nw = Math.max(MIN_W, sw + (ev.clientX - mx)); nh = Math.max(MIN_H, sh + (ev.clientY - my)); setSize({ w: nw, h: nh }); };
+    const end = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", end); onPatch({ w: nw, h: nh }); };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", end);
   };
 
   const onBodyPaste = async (e: React.ClipboardEvent) => {
@@ -126,7 +126,7 @@ export default function CalcAnnoPanel({
 
   return (
     <div className="anno-panel" style={{ left: pos.x, top: pos.y, width: size.w, height: size.h }} onPaste={onBodyPaste}>
-      <div className="anno-bar" onMouseDown={startDrag}>
+      <div className="anno-bar" onPointerDown={startDrag}>
         <span className="anno-cell">{cell}</span>
         <span className="anno-num">#{num}</span>
         {editingTitle ? (
@@ -186,7 +186,7 @@ export default function CalcAnnoPanel({
         <span style={{ flex: 1 }} />
       </div>
 
-      <span className="anno-resize" title="Drag to resize" onMouseDown={startResize} />
+      <span className="anno-resize" title="Drag to resize" onPointerDown={startResize} />
     </div>
   );
 }

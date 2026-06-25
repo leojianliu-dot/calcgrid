@@ -49,7 +49,7 @@
 /* Clean header frame: column letters + row numbers (static, click to select). */
 .calc-colhead, .calc-rowhead { background: #f1efec; color: var(--muted); font-weight: normal; font-size: 11px; text-align: center; cursor: pointer; user-select: none; }
 .calc-colhead { padding: 3px 6px; position: relative; }
-.calc-colresize { position: absolute; top: 0; right: -3px; width: 6px; height: 100%; cursor: col-resize; z-index: 2; }
+.calc-colresize { position: absolute; top: 0; right: -3px; width: 10px; height: 100%; cursor: col-resize; z-index: 2; touch-action: none; }
 .calc-rowhead { width: 30px; padding: 3px 4px; }
 .calc-colhead.sel, .calc-rowhead.sel { background: rgba(217,119,87,0.30); color: var(--ink); }
 .calc-corner { width: 30px; background: #e7e3dd; cursor: pointer; }
@@ -115,7 +115,7 @@
 }
 
 /* Cell-annotation anchor button (sits in one empty cell; click = show/hide, drag = move). */
-.calc-annobtn { box-sizing: border-box; width: 100%; min-height: 22px; display: flex; align-items: center; gap: 2px; padding: 0 6px; border: 1px solid #93b4f5; border-radius: 4px; background: #eef3fe; color: #1e3a8a; font-size: 11px; line-height: 1; cursor: grab; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.calc-annobtn { box-sizing: border-box; width: 100%; min-height: 22px; display: flex; align-items: center; gap: 2px; padding: 0 6px; border: 1px solid #93b4f5; border-radius: 4px; background: #eef3fe; color: #1e3a8a; font-size: 11px; line-height: 1; cursor: grab; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; touch-action: none; }
 .calc-annobtn.open { background: #2563eb; border-color: #2563eb; color: #fff; }
 .calc-annobtn:hover { box-shadow: 0 0 0 1px #2563eb; }
 .calc-droptarget { outline: 2px dashed #2563eb; outline-offset: -2px; }
@@ -130,7 +130,7 @@
 
 /* Annotation panel: non-blocking, draggable + corner-resizable floating window. */
 .anno-panel { position: fixed; z-index: 200; min-width: 220px; min-height: 160px; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.28); display: flex; flex-direction: column; overflow: hidden; }
-.anno-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #f1efec; border-bottom: 1px solid var(--line); cursor: move; user-select: none; }
+.anno-bar { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #f1efec; border-bottom: 1px solid var(--line); cursor: move; user-select: none; touch-action: none; }
 .anno-cell { font-size: 11px; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
 .anno-num { font-size: 11px; font-weight: 700; color: #2563eb; }
 .anno-title-text { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: text; }
@@ -150,5 +150,5 @@
 .anno-confirm { font-size: 12px; color: var(--ink); }
 .anno-del { border-color: #dc2626; color: #dc2626; }
 .anno-del:hover { background: #dc2626; border-color: #dc2626; color: #fff; }
-.anno-resize { position: absolute; right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize;
+.anno-resize { position: absolute; right: 0; bottom: 0; width: 18px; height: 18px; cursor: nwse-resize; touch-action: none;
   background: linear-gradient(135deg, transparent 50%, var(--muted) 50%, var(--muted) 60%, transparent 60%, transparent 72%, var(--muted) 72%, var(--muted) 82%, transparent 82%); }
