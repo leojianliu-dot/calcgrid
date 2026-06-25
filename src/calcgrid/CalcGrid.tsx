@@ -94,6 +94,30 @@ function BorderIcon({ kind }: { kind: BorderKind }) {
   );
 }
 
+// Unified toolbar icons — inline SVG (one stroke weight, currentColor) so they
+// render identically on every device (no missing-font glyph boxes) and look modern.
+type TbIconName =
+  | "undo" | "redo" | "alignLeft" | "alignCenter" | "alignRight" | "wrap"
+  | "fill" | "note" | "clear" | "delRow" | "delCol" | "help" | "trash";
+function TbIcon({ name }: { name: TbIconName }) {
+  const S = { width: 17, height: 17, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+  switch (name) {
+    case "undo": return <svg {...S}><path d="M8 7l-4 4 4 4" /><path d="M4 11h9a6 6 0 0 1 0 12H9" /></svg>;
+    case "redo": return <svg {...S}><path d="M16 7l4 4-4 4" /><path d="M20 11h-9a6 6 0 0 0 0 12h4" /></svg>;
+    case "alignLeft": return <svg {...S}><line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="11" x2="13" y2="11" /><line x1="4" y1="16" x2="20" y2="16" /><line x1="4" y1="21" x2="13" y2="21" /></svg>;
+    case "alignCenter": return <svg {...S}><line x1="4" y1="6" x2="20" y2="6" /><line x1="7" y1="11" x2="17" y2="11" /><line x1="4" y1="16" x2="20" y2="16" /><line x1="7" y1="21" x2="17" y2="21" /></svg>;
+    case "alignRight": return <svg {...S}><line x1="4" y1="6" x2="20" y2="6" /><line x1="11" y1="11" x2="20" y2="11" /><line x1="4" y1="16" x2="20" y2="16" /><line x1="11" y1="21" x2="20" y2="21" /></svg>;
+    case "wrap": return <svg {...S}><line x1="4" y1="6" x2="20" y2="6" /><path d="M4 12h13a3 3 0 0 1 0 6h-5" /><path d="M14 15l-3 3 3 3" /><line x1="4" y1="18" x2="8" y2="18" /></svg>;
+    case "fill": return <svg {...S}><path d="M7 10V7a3 3 0 0 1 6 0v3" /><path d="M5 10h10l-1.4 8.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 10z" /></svg>;
+    case "note": return <svg {...S}><path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" /></svg>;
+    case "clear": return <svg {...S}><path d="M8 18l-3.5-3.5a2 2 0 0 1 0-3l7-7a2 2 0 0 1 3 0l4 4a2 2 0 0 1 0 3L13 18z" /><line x1="6" y1="21" x2="20" y2="21" /></svg>;
+    case "delRow": return <svg {...S}><rect x="3.5" y="9" width="17" height="6" rx="1.5" /><line x1="15" y1="20" x2="21" y2="20" /></svg>;
+    case "delCol": return <svg {...S}><rect x="9" y="3.5" width="6" height="17" rx="1.5" /><line x1="3" y1="20" x2="6.5" y2="20" /></svg>;
+    case "help": return <svg {...S}><circle cx="12" cy="12" r="9" /><path d="M9.2 9.3a3 3 0 0 1 5.6 1.2c0 2-3 2.5-3 4" /><line x1="12" y1="17.5" x2="12" y2="17.5" /></svg>;
+    case "trash": return <svg {...S}><line x1="4" y1="7" x2="20" y2="7" /><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" /></svg>;
+  }
+}
+
 // CalcGrid — a persistence-agnostic, Excel-like editable grid.
 //
 // It takes an initial `data` model and emits a new model via `onChange` on every
@@ -892,8 +916,8 @@ export default function CalcGrid({
   return (
     <div className="calc-sheet">
       <div className="calc-toolbar">
-        <button className="calc-tb" title="Undo (Ctrl+Z)" disabled={!canUndo} onMouseDown={(e) => e.preventDefault()} onClick={undo}>↶</button>
-        <button className="calc-tb" title="Redo (Ctrl+Y)" disabled={!canRedo} onMouseDown={(e) => e.preventDefault()} onClick={redo}>↷</button>
+        <button className="calc-tb calc-tb-ico" title="Undo (Ctrl+Z)" disabled={!canUndo} onMouseDown={(e) => e.preventDefault()} onClick={undo}><TbIcon name="undo" /></button>
+        <button className="calc-tb calc-tb-ico" title="Redo (Ctrl+Y)" disabled={!canRedo} onMouseDown={(e) => e.preventDefault()} onClick={redo}><TbIcon name="redo" /></button>
         <span className="calc-tb-sep" />
         <button className={`calc-tb${activeStyle?.bold ? " on" : ""}`} title="Bold" onMouseDown={(e) => e.preventDefault()} onClick={toggleBold}><b>B</b></button>
         <select
@@ -906,10 +930,10 @@ export default function CalcGrid({
           {[10, 11, 12, 13, 14, 16, 18, 20, 24].map((sz) => <option key={sz} value={sz}>{sz}</option>)}
         </select>
         <span className="calc-tb-sep" />
-        <button className="calc-tb" title="Align left" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ align: "left" })}>⯇</button>
-        <button className="calc-tb" title="Align center" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ align: "center" })}>≡</button>
-        <button className="calc-tb" title="Align right" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ align: "right" })}>⯈</button>
-        <button className={`calc-tb${activeStyle?.wrap ? " on" : ""}`} title="Wrap text" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ wrap: activeStyle?.wrap ? undefined : true })}>Wrap</button>
+        <button className={`calc-tb calc-tb-ico${activeStyle?.align === "left" ? " on" : ""}`} title="Align left" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ align: "left" })}><TbIcon name="alignLeft" /></button>
+        <button className={`calc-tb calc-tb-ico${activeStyle?.align === "center" ? " on" : ""}`} title="Align center" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ align: "center" })}><TbIcon name="alignCenter" /></button>
+        <button className={`calc-tb calc-tb-ico${activeStyle?.align === "right" ? " on" : ""}`} title="Align right" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ align: "right" })}><TbIcon name="alignRight" /></button>
+        <button className={`calc-tb calc-tb-ico${activeStyle?.wrap ? " on" : ""}`} title="Wrap text" onMouseDown={(e) => e.preventDefault()} onClick={() => applyStyle({ wrap: activeStyle?.wrap ? undefined : true })}><TbIcon name="wrap" /></button>
         <span className="calc-tb-sep" />
         <span className="calc-colorwrap">
           <button className="calc-tb" title="Font color" onMouseDown={(e) => e.preventDefault()} onClick={() => setColorMenu(colorMenu === "font" ? null : "font")}>
@@ -918,7 +942,7 @@ export default function CalcGrid({
           {colorMenu === "font" && <ColorPalette onPick={(c) => { applyStyle({ color: c }); setColorMenu(null); }} onClear={() => { applyStyle({ color: undefined }); setColorMenu(null); }} />}
         </span>
         <span className="calc-colorwrap">
-          <button className="calc-tb" title="Fill color" onMouseDown={(e) => e.preventDefault()} onClick={() => setColorMenu(colorMenu === "fill" ? null : "fill")}>▦</button>
+          <button className="calc-tb calc-tb-ico" title="Fill color" onMouseDown={(e) => e.preventDefault()} onClick={() => setColorMenu(colorMenu === "fill" ? null : "fill")}><TbIcon name="fill" /></button>
           {colorMenu === "fill" && <ColorPalette onPick={(c) => { applyStyle({ fill: c }); setColorMenu(null); }} onClear={() => { applyStyle({ fill: undefined }); setColorMenu(null); }} />}
         </span>
         <span className="calc-tb-sep" />
@@ -937,7 +961,7 @@ export default function CalcGrid({
         <button className={`calc-tb${activeStyle?.cur ? " on" : ""}`} title="Currency ($)" onMouseDown={(e) => e.preventDefault()} onClick={toggleCurrency}>$</button>
         <span className="calc-tb-sep" />
         <span className="calc-colorwrap">
-          <button className="calc-tb" title="Borders" onMouseDown={(e) => e.preventDefault()} onClick={() => setColorMenu(colorMenu === "border" ? null : "border")}><BorderIcon kind="outline" /></button>
+          <button className="calc-tb calc-tb-ico" title="Borders" onMouseDown={(e) => e.preventDefault()} onClick={() => setColorMenu(colorMenu === "border" ? null : "border")}><BorderIcon kind="outline" /></button>
           {colorMenu === "border" && (
             <div className="calc-palette calc-bordermenu" onMouseDown={(e) => e.preventDefault()}>
               <button className="calc-bdicon" title="All borders" onClick={() => { applyBorder("all"); setColorMenu(null); }}><BorderIcon kind="all" /></button>
@@ -950,22 +974,22 @@ export default function CalcGrid({
           )}
         </span>
         <span className="calc-tb-sep" />
-        <button className="calc-tb" title="Add a note / screenshot to a cell (or just paste a screenshot onto an empty cell)" onMouseDown={(e) => e.preventDefault()} onClick={() => requestAnnotation({})}>📝 Note</button>
-        <button className="calc-tb" title="Clear formatting" onMouseDown={(e) => e.preventDefault()} onClick={clearFormat}>Clear</button>
+        <button className="calc-tb calc-tb-lbl" title="Add a note / screenshot to a cell (or just paste a screenshot onto an empty cell)" onMouseDown={(e) => e.preventDefault()} onClick={() => requestAnnotation({})}><TbIcon name="note" /> Note</button>
+        <button className="calc-tb calc-tb-ico" title="Clear formatting" onMouseDown={(e) => e.preventDefault()} onClick={clearFormat}><TbIcon name="clear" /></button>
         <span className="calc-tb-sep" />
         <label className="calc-tb" title="Show gridlines"><input type="checkbox" checked={gridlinesOn} onChange={toggleGridlines} /> Gridlines</label>
         <span className="calc-tb-sep" />
-        <button className="calc-tb" title="Delete the selected row(s)" onMouseDown={(e) => e.preventDefault()} onClick={deleteSelectedRows}>⌦ Row</button>
-        <button className="calc-tb" title="Delete the selected column(s)" onMouseDown={(e) => e.preventDefault()} onClick={deleteSelectedCols}>⌦ Col</button>
+        <button className="calc-tb calc-tb-lbl" title="Delete the selected row(s)" onMouseDown={(e) => e.preventDefault()} onClick={deleteSelectedRows}><TbIcon name="delRow" /> Row</button>
+        <button className="calc-tb calc-tb-lbl" title="Delete the selected column(s)" onMouseDown={(e) => e.preventDefault()} onClick={deleteSelectedCols}><TbIcon name="delCol" /> Col</button>
         <span className="calc-tb-spacer" />
         {saveState !== "idle" && (
           <span className={`calc-savestate calc-save-${saveState}`} title="Save status">
             {saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved" : "Save failed"}
           </span>
         )}
-        <button className="calc-tb" title="Help — how to use this sheet" onMouseDown={(e) => e.preventDefault()} onClick={() => setShowHelp(true)}>?</button>
+        <button className="calc-tb calc-tb-ico" title="Help — how to use this sheet" onMouseDown={(e) => e.preventDefault()} onClick={() => setShowHelp(true)}><TbIcon name="help" /></button>
         {onDeleteSheet && (
-          <button className="calc-tb calc-tb-danger" title="Delete this whole sheet" onMouseDown={(e) => e.preventDefault()} onClick={onDeleteSheet}>🗑</button>
+          <button className="calc-tb calc-tb-ico calc-tb-danger" title="Delete this whole sheet" onMouseDown={(e) => e.preventDefault()} onClick={onDeleteSheet}><TbIcon name="trash" /></button>
         )}
       </div>
 
