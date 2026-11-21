@@ -36,8 +36,10 @@ interface Options {
 interface PointState {
   before: string;
   after: string;
-  aRow: number; aCol: number;
-  hRow: number; hCol: number;
+  aRow: number;
+  aCol: number;
+  hRow: number;
+  hCol: number;
 }
 
 const ARROW_DELTA: Record<string, [number, number]> = {
@@ -49,24 +51,47 @@ const ARROW_DELTA: Record<string, [number, number]> = {
 
 // F4 cycles the $ anchors on the cell reference at (or just before) the caret:
 // A1 → $A$1 → A$1 → $A1 → A1. Returns the new text + caret, or null if no ref.
-function cycleAbsAt(text: string, caret: number): { text: string; caret: number } | null {
+function cycleAbsAt(
+  text: string,
+  caret: number,
+): { text: string; caret: number } | null {
   const re = /(\$?)([A-Za-z]+)(\$?)(\d+)/g;
   let m: RegExpExecArray | null;
   let hit: { start: number; end: number; m: RegExpExecArray } | null = null;
   while ((m = re.exec(text))) {
-    const start = m.index, end = start + m[0].length;
-    if (caret >= start && caret <= end) { hit = { start, end, m }; break; } // caret inside/adjacent
+    const start = m.index,
+      end = start + m[0].length;
+    if (caret >= start && caret <= end) {
+      hit = { start, end, m };
+      break;
+    } // caret inside/adjacent
     if (end <= caret) hit = { start, end, m }; // remember the last ref before the caret as fallback
   }
   if (!hit) return null;
   const [, ca, letters, ra, digits] = hit.m;
-  let nca = ca, nra = ra;
-  if (!ca && !ra) { nca = "$"; nra = "$"; }       // A1 → $A$1
-  else if (ca && ra) { nca = ""; nra = "$"; }      // $A$1 → A$1
-  else if (!ca && ra) { nca = "$"; nra = ""; }     // A$1 → $A1
-  else { nca = ""; nra = ""; }                     // $A1 → A1
+  let nca = ca,
+    nra = ra;
+  if (!ca && !ra) {
+    nca = "$";
+    nra = "$";
+  } // A1 → $A$1
+  else if (ca && ra) {
+    nca = "";
+    nra = "$";
+  } // $A$1 → A$1
+  else if (!ca && ra) {
+    nca = "$";
+    nra = "";
+  } // A$1 → $A1
+  else {
+    nca = "";
+    nra = "";
+  } // $A1 → A1
   const ref = `${nca}${letters}${nra}${digits}`;
-  return { text: text.slice(0, hit.start) + ref + text.slice(hit.end), caret: hit.start + ref.length };
+  return {
+    text: text.slice(0, hit.start) + ref + text.slice(hit.end),
+    caret: hit.start + ref.length,
+  };
 }
 
 function refExpecting(text: string, caret: number): boolean {
@@ -77,7 +102,13 @@ function refExpecting(text: string, caret: number): boolean {
 }
 
 export function useFormulaPointMode({
-  editing, draft, setDraft, cellRef, isReferenceable, rowCount, colCount,
+  editing,
+  draft,
+  setDraft,
+  cellRef,
+  isReferenceable,
+  rowCount,
+  colCount,
 }: Options) {
   const editInputRef = useRef<HTMLInputElement | null>(null);
   const pendingCaret = useRef<number | null>(null);
@@ -85,32 +116,51 @@ export function useFormulaPointMode({
   // Mouse drag point (drives blur/selection suppression via `pointing`).
   const [mouse, setMouse] = useState<PointState | null>(null);
   const mouseRef = useRef<PointState | null>(null);
-  const setMousePt = (p: PointState | null) => { mouseRef.current = p; setMouse(p); };
+  const setMousePt = (p: PointState | null) => {
+    mouseRef.current = p;
+    setMouse(p);
+  };
 
   // Keyboard point: authoritative in a ref (sync), mirrored to state for the
   // highlight only.
   const [keyHi, setKeyHi] = useState<PointState | null>(null);
   const kbRef = useRef<PointState | null>(null);
-  const setKb = (p: PointState | null) => { kbRef.current = p; setKeyHi(p); };
+  const setKb = (p: PointState | null) => {
+    kbRef.current = p;
+    setKeyHi(p);
+  };
 
   // Live mirror of the draft so a synchronous keydown reads the true value.
   const draftRef = useRef(draft);
-  useEffect(() => { draftRef.current = draft; }, [draft]);
-  const writeDraft = (text: string) => { draftRef.current = text; setDraft(text); };
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
+  const writeDraft = (text: string) => {
+    draftRef.current = text;
+    setDraft(text);
+  };
 
   // Reset ALL point state whenever the edited cell changes (start or finish an
   // edit). Without this, a point left over from the previous cell resumes on
   // the next cell's first arrow press.
-  useEffect(() => { setKb(null); setMousePt(null); }, [editing]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    setKb(null);
+    setMousePt(null);
+  }, [editing]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isFormulaDraft = (text: string) => editing != null && text.trimStart().startsWith("=");
+  const isFormulaDraft = (text: string) =>
+    editing != null && text.trimStart().startsWith("=");
 
   // Keep focus on the formula input and move the caret past the inserted token.
   useEffect(() => {
     if (pendingCaret.current != null && editInputRef.current) {
       const pos = pendingCaret.current;
       editInputRef.current.focus();
-      try { editInputRef.current.setSelectionRange(pos, pos); } catch { /* non-text input */ }
+      try {
+        editInputRef.current.setSelectionRange(pos, pos);
+      } catch {
+        /* non-text input */
+      }
       pendingCaret.current = null;
     }
   }, [draft]);
@@ -130,7 +180,9 @@ export function useFormulaPointMode({
   );
 
   const refToken = (aRow: number, aCol: number, hRow: number, hCol: number) =>
-    aRow === hRow && aCol === hCol ? cellRef(hRow, hCol) : `${cellRef(aRow, aCol)}:${cellRef(hRow, hCol)}`;
+    aRow === hRow && aCol === hCol
+      ? cellRef(hRow, hCol)
+      : `${cellRef(aRow, aCol)}:${cellRef(hRow, hCol)}`;
 
   // ---- Mouse pointing -----------------------------------------------------
   const onCellMouseDown = useCallback(
@@ -142,8 +194,9 @@ export function useFormulaPointMode({
       e.preventDefault();
       setKb(null);
       const input = editInputRef.current;
-      const caret = input ? input.selectionStart ?? text.length : text.length;
-      const before = text.slice(0, caret), after = text.slice(caret);
+      const caret = input ? (input.selectionStart ?? text.length) : text.length;
+      const before = text.slice(0, caret),
+        after = text.slice(caret);
       const refStr = cellRef(row, col);
       writeDraft(before + refStr + after);
       setMousePt({ before, after, aRow: row, aCol: col, hRow: row, hCol: col });
@@ -176,9 +229,14 @@ export function useFormulaPointMode({
       if (e.key === "F4") {
         e.preventDefault();
         const input = editInputRef.current;
-        const caret = input ? input.selectionStart ?? text.length : text.length;
+        const caret = input
+          ? (input.selectionStart ?? text.length)
+          : text.length;
         const res = cycleAbsAt(text, caret);
-        if (res) { writeDraft(res.text); pendingCaret.current = res.caret; }
+        if (res) {
+          writeDraft(res.text);
+          pendingCaret.current = res.caret;
+        }
         return true;
       }
 
@@ -193,20 +251,35 @@ export function useFormulaPointMode({
         const aCol = e.shiftKey ? kb.aCol : head.col;
         const refStr = refToken(aRow, aCol, head.row, head.col);
         writeDraft(kb.before + refStr + kb.after);
-        setKb({ before: kb.before, after: kb.after, aRow, aCol, hRow: head.row, hCol: head.col });
+        setKb({
+          before: kb.before,
+          after: kb.after,
+          aRow,
+          aCol,
+          hRow: head.row,
+          hCol: head.col,
+        });
         pendingCaret.current = kb.before.length + refStr.length;
         return true;
       }
 
       const input = editInputRef.current;
-      const caret = input ? input.selectionStart ?? text.length : text.length;
+      const caret = input ? (input.selectionStart ?? text.length) : text.length;
       if (!refExpecting(text, caret)) return true; // mid-formula caret move; don't navigate away
       e.preventDefault();
-      const before = text.slice(0, caret), after = text.slice(caret);
+      const before = text.slice(0, caret),
+        after = text.slice(caret);
       const head = clampRef(editRow + delta[0], editCol + delta[1]); // start next to the formula cell
       const refStr = cellRef(head.row, head.col);
       writeDraft(before + refStr + after);
-      setKb({ before, after, aRow: head.row, aCol: head.col, hRow: head.row, hCol: head.col });
+      setKb({
+        before,
+        after,
+        aRow: head.row,
+        aCol: head.col,
+        hRow: head.row,
+        hCol: head.col,
+      });
       pendingCaret.current = before.length + refStr.length;
       return true;
     },
@@ -217,11 +290,15 @@ export function useFormulaPointMode({
 
   // ---- Highlight ----------------------------------------------------------
   const inBox = (row: number, col: number, p: PointState) =>
-    row >= Math.min(p.aRow, p.hRow) && row <= Math.max(p.aRow, p.hRow) &&
-    col >= Math.min(p.aCol, p.hCol) && col <= Math.max(p.aCol, p.hCol);
+    row >= Math.min(p.aRow, p.hRow) &&
+    row <= Math.max(p.aRow, p.hRow) &&
+    col >= Math.min(p.aCol, p.hCol) &&
+    col <= Math.max(p.aCol, p.hCol);
 
   const inRange = useCallback(
-    (row: number, col: number) => (mouse != null && inBox(row, col, mouse)) || (keyHi != null && inBox(row, col, keyHi)),
+    (row: number, col: number) =>
+      (mouse != null && inBox(row, col, mouse)) ||
+      (keyHi != null && inBox(row, col, keyHi)),
     [mouse, keyHi],
   );
 

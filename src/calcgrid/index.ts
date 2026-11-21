@@ -12,5 +12,12 @@ export type {
   SaveState,
 } from "./types";
 // Formula engine + number formatting are reusable on their own too.
-export { makeResolver, evalFormula, translateFormula, balanceParens, colLetterToNum, numToColLetter } from "./calc";
+export {
+  makeResolver,
+  evalFormula,
+  translateFormula,
+  balanceParens,
+  colLetterToNum,
+  numToColLetter,
+} from "./calc";
 export { fmtAccounting, isNegativeNum } from "./format";

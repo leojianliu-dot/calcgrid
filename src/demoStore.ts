@@ -19,7 +19,10 @@ function sampleModel(): CalcModel {
       "3:1": { v: "成本 Cost" },
       "3:2": { v: "-450", s: { cur: true } },
       "4:1": { v: "净额 Net", s: { bold: true } },
-      "4:2": { v: "=B2+B3", s: { cur: true, bold: true, bd: { t: true, b: 2 } } },
+      "4:2": {
+        v: "=B2+B3",
+        s: { cur: true, bold: true, bd: { t: true, b: 2 } },
+      },
       "6:1": { v: "毛利率 Margin" },
       "6:2": { v: "=B4/B2", s: { fmt: "pct", dp: 1 } },
       "8:1": { v: "← 试试：双击单元格编辑、输入 = 写公式" },
@@ -30,7 +33,7 @@ function sampleModel(): CalcModel {
         r: 2,
         c: 4,
         title: "欢迎试用 / Welcome",
-        note: "这是一个<b>批注</b>：可写笔记，或<span style=\"color:#dc2626\">粘贴一张截图</span>。拖动标题栏可移动，拖右下角可缩放。",
+        note: '这是一个<b>批注</b>：可写笔记，或<span style="color:#dc2626">粘贴一张截图</span>。拖动标题栏可移动，拖右下角可缩放。',
         open: true,
         w: 320,
         h: 230,
@@ -43,7 +46,9 @@ export function loadModel(): CalcModel {
   try {
     const raw = localStorage.getItem(MODEL_KEY);
     if (raw) return JSON.parse(raw) as CalcModel;
-  } catch { /* fall through to sample */ }
+  } catch {
+    /* fall through to sample */
+  }
   return sampleModel();
 }
 
@@ -55,7 +60,8 @@ export function clearDemo(): void {
   const keys: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && (k === MODEL_KEY || k === IMG_SEQ || k.startsWith(IMG_PREFIX))) keys.push(k);
+    if (k && (k === MODEL_KEY || k === IMG_SEQ || k.startsWith(IMG_PREFIX)))
+      keys.push(k);
   }
   keys.forEach((k) => localStorage.removeItem(k));
 }
@@ -75,11 +81,19 @@ export async function uploadImage(file: File): Promise<number> {
   const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
   const id = Number(localStorage.getItem(IMG_SEQ) || "0") + 1;
   localStorage.setItem(IMG_SEQ, String(id));
-  localStorage.setItem(IMG_PREFIX + id, JSON.stringify({ contentType: file.type || "image/png", dataBase64: base64 }));
+  localStorage.setItem(
+    IMG_PREFIX + id,
+    JSON.stringify({
+      contentType: file.type || "image/png",
+      dataBase64: base64,
+    }),
+  );
   return id;
 }
 
-export async function fetchImage(id: number): Promise<{ contentType: string; dataBase64: string }> {
+export async function fetchImage(
+  id: number,
+): Promise<{ contentType: string; dataBase64: string }> {
   const raw = localStorage.getItem(IMG_PREFIX + id);
   if (!raw) throw new Error("image not found");
   return JSON.parse(raw);
