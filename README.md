@@ -44,3 +44,9 @@ Pushing to `main` builds and publishes the demo to GitHub Pages via
 
 ## Stack
 React 18 · TypeScript · Vite · DOMPurify (note sanitizing). License: TBD.
+
+## Code layout
+Prettier is pinned exactly in `package.json` `devDependencies` (`.prettierrc.json` holds the
+defaults, `.prettierignore` names what it leaves alone). This repo has no commit hook, so
+nothing checks the layout at commit; put changed files in the pinned layout with
+`npx prettier@<pinned version> --write <files>` before committing.

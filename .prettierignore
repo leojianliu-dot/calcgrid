@@ -1,0 +1,7 @@
+# Prettier leaves these alone (Leo, 11/21/2026, formatter rollout).
+# Installed packages and build output
+node_modules/
+dist/
+dist-ssr/
+# Lock files (npm writes them)
+package-lock.json
